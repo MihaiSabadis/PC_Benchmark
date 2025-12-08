@@ -1,0 +1,56 @@
+@startuml
+skinparam componentStyle rectangle
+top to bottom direction
+
+' ===========================
+' LAYER 1 – USER / CLI
+' ===========================
+package "Layer 1: User / CLI" {
+actor User
+[Main (main.c)]
+}
+
+' ===========================
+' LAYER 2 – CONTROL
+' ===========================
+package "Layer 2: Control" {
+[Controller (controller.c)]
+[Suite (suite.c)]
+}
+
+' ===========================
+' LAYER 3 – BENCHMARK CORE
+' ===========================
+package "Layer 3: Benchmark Core" {
+[IntegerMix (integer_mix.c)]
+[Refs (refs.c)]
+[TestCase (testcase.c)]
+}
+
+' ===========================
+' LAYER 4 – INFRASTRUCTURE / SUPPORT
+' ===========================
+package "Layer 4: Infrastructure / Support" {
+[Timer (timer.c)]
+[Config (config*.c)]
+[Util (util.c)]
+[MetricUnits (metric_units.h)]
+}
+
+' ===== Dependencies between layers =====
+User --> [Main (main.c)]
+
+[Main (main.c)] --> [Controller (controller.c)]
+[Controller (controller.c)] --> [Suite (suite.c)]
+
+[Suite (suite.c)] --> [IntegerMix (integer_mix.c)]
+[Suite (suite.c)] --> [Refs (refs.c)]
+[Suite (suite.c)] --> [TestCase (testcase.c)]
+
+[IntegerMix (integer_mix.c)] --> [Timer (timer.c)]
+[IntegerMix (integer_mix.c)] --> [Config (config*.c)]
+[IntegerMix (integer_mix.c)] --> [Util (util.c)]
+
+[Suite (suite.c)] --> [MetricUnits (metric_units.h)]
+
+@enduml
