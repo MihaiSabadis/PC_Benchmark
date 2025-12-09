@@ -1,13 +1,16 @@
 #include "refs.h"
 
-// Starter references (rough). After your first stable run, copy your
-// own machine's metrics here to make indices ~1.0 on that box.
+// Calibrated on: <your PC>, Win11, VS2022 x64-Release
+// Sizes: INT 64MiB x4, FLOAT N=4,194,304, TRIAD N=16,777,216, AES 128MiB, COMP 64MiB
+// Date: <2025-12-09>. Method: median of 5 run averages.
+
 static const BenchRefs REFS = {
-    .pref_integer_mips = 3000.0,   // 3,000 MIPS
-    .pref_float_mflops = 50000.0,  // 50,000 MFLOPS
-    .pref_mem_mbps = 25000.0,  // 25,000 MB/s (?25 GB/s)
-    .pref_aes_mbps = 3000.0,   // 3,000 MB/s
-    .pref_comp_mbps = 700.0     // 700 MB/s (avg comp/decomp)
+    .pref_integer_mips = 2265.930017,  // INT  (MIPS)
+    .pref_float_mflops = 888.615464,  // FP   (MFLOPS)
+    .pref_mem_mbps = 11190.759438,  // MEM  (MB/s)
+    .pref_aes_mbps = 1581.968614,  // AES  (MB/s)
+    .pref_comp_mbps = 710.712300   // CMP  (MB/s)
 };
+
 
 const BenchRefs* bench_refs_defaults(void) { return &REFS; }
