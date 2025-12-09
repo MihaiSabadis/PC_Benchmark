@@ -191,11 +191,31 @@ class BenchmarkApp(ctk.CTk):
         threading.Thread(target=self._run_full_sequence).start()
 
     def _run_full_sequence(self):
-        # NOTE: This blocks the thread, which is fine, but UI updates must go via self.after
-        # This is a bit complex to do perfectly in a simple script, 
-        # but you can implement a queue system if needed.
-        self.log("Note: Please run tests individually for best visualization in this demo.")
-        pass
+        import time
+        
+        # Iterate through all tests (0 to 4)
+        for tid in TESTS:
+            # 1. Reset data for this test
+            self.results[tid] = []
+            
+            # 2. Log start
+            self.log(f"--- Starting {TESTS[tid]} ---")
+            
+            # 3. Create a callback specifically for THIS test ID
+            # We use _tid=tid to capture the current value of the loop variable
+            def on_progress(run, score, _tid=tid):
+                self.after(0, self.update_data, _tid, run, score)
+
+            c_cb = CALLBACK_TYPE(on_progress)
+            
+            # 4. Call C function
+            # Since we are in a thread, this BLOCKS here until the C code finishes 5 runs
+            lib.run_test_by_id(tid, c_cb)
+            
+            # 5. Optional: Pause for 1 second so you can see the graph result before it clears
+            time.sleep(1.0)
+            
+        self.log(">>> FULL SUITE COMPLETE <<<")
 
 if __name__ == "__main__":
     app = BenchmarkApp()
