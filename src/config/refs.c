@@ -14,3 +14,5 @@ static const BenchRefs REFS = {
 
 
 const BenchRefs* bench_refs_defaults(void) { return &REFS; }
+
+//random and sequencial for memory access and test

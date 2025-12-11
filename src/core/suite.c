@@ -88,6 +88,12 @@ void run_test_by_id(int id, StatusCallback cb) {
             score = compress_mbps_once();
             break;
 
+        case TEST_MEMORY_LATENCY: // <--- Used proper ID here
+            // Make sure memory_random_mops_once is declared in memory_triad.h
+            // if (r == 0) memory_random_mops_once(); // Optional warmup
+            score = memory_random_mops_once();
+            break;
+
         default:
             score = 0.0;
             break;
@@ -106,6 +112,8 @@ API double get_test_reference(int id) {
     case TEST_MEMORY:  return refs->pref_mem_mbps;
     case TEST_AES:     return refs->pref_aes_mbps;
     case TEST_COMP:    return refs->pref_comp_mbps;
+    // For now, we return 1.0 for Latency until you calibrate it
+    case TEST_MEMORY_LATENCY: return 1.0;
     default: return 1.0;
     }
 }

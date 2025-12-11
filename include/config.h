@@ -1,6 +1,17 @@
 #pragma once
 #include <stddef.h>
 
+// Define exports for Windows DLL
+#ifdef _WIN32
+#ifdef pcbench_EXPORTS
+#define API __declspec(dllexport)
+#else
+#define API __declspec(dllimport)
+#endif
+#else
+#define API
+#endif
+
 typedef struct {
     int    repetitionsK;          // runs per module
     int    warmup;                // unmeasured warmup runs
@@ -15,7 +26,11 @@ typedef struct {
 #ifdef __cplusplus
 extern "C" {
 #endif
-    const BenchConfig* bench_config_defaults(void);
+    // Returns the current configuration (mutable)
+    API BenchConfig* bench_config_defaults(void);
+
+    // 0=Quick, 1=Standard, 2=Extreme
+    API void set_config_profile(int profile_id);
 #ifdef __cplusplus
 }
 #endif
