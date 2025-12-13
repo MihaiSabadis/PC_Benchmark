@@ -15,7 +15,7 @@
 
 
 // --- types first (before any use) -------------------------------------------
-typedef enum { PREF_INT, PREF_FP, PREF_MEM, PREF_AES, PREF_COMP } PrefKind;
+typedef enum { PREF_INT, PREF_FP, PREF_MEM, PREF_AES, PREF_COMP, PREF_LATENCY } PrefKind;
 
 typedef struct {
     const char* id;
@@ -30,8 +30,9 @@ static double pick_pref(PrefKind k, const BenchRefs* r) {
     case PREF_INT:  return r->pref_integer_mips;
     case PREF_FP:   return r->pref_float_mflops;
     case PREF_MEM:  return r->pref_mem_mbps;
-    case PREF_AES:  return r->pref_aes_mbps;     // <- make sure refs.h/.c have these
-    case PREF_COMP: return r->pref_comp_mbps;    // <-
+    case PREF_AES:  return r->pref_aes_mbps;
+    case PREF_COMP: return r->pref_comp_mbps;
+	case PREF_LATENCY: return 1.0; // Placeholder for latency
     default:        return 1.0;
     }
 }
@@ -112,8 +113,7 @@ API double get_test_reference(int id) {
     case TEST_MEMORY:  return refs->pref_mem_mbps;
     case TEST_AES:     return refs->pref_aes_mbps;
     case TEST_COMP:    return refs->pref_comp_mbps;
-    // For now, we return 1.0 for Latency until you calibrate it
-    case TEST_MEMORY_LATENCY: return 1.0;
+    case TEST_MEMORY_LATENCY: return refs->pref_latency_mops;
     default: return 1.0;
     }
 }
@@ -131,6 +131,7 @@ void suite_run_all(void) {
         { "MEM", "Memory TRIAD (A=B+s*C)",   "MB/s",   PREF_MEM,  memory_mbps_once },
         { "AES", "AES-128 ECB (throughput)", "MB/s",   PREF_AES,  aes_mbps_once },
         { "CMP", "DEFLATE-style codec",      "MB/s",   PREF_COMP, compress_mbps_once },
+        { "RND", "Memory Random Latency",    "MOPS",   (PrefKind)TEST_MEMORY_LATENCY, memory_random_mops_once }
     };
     const int T = (int)(sizeof(tests) / sizeof(tests[0]));
 

@@ -1,18 +1,14 @@
 #include "refs.h"
 
-// Calibrated on: <your PC>, Win11, VS2022 x64-Release
-// Sizes: INT 64MiB x4, FLOAT N=4,194,304, TRIAD N=16,777,216, AES 128MiB, COMP 64MiB
-// Date: <2025-12-09>. Method: median of 5 run averages.
-
+// Calibrated on User PC
+// Based on 5-run average from run.csv
 static const BenchRefs REFS = {
-    .pref_integer_mips = 2265.930017,  // INT  (MIPS)
-    .pref_float_mflops = 888.615464,  // FP   (MFLOPS)
-    .pref_mem_mbps = 11190.759438,  // MEM  (MB/s)
-    .pref_aes_mbps = 1581.968614,  // AES  (MB/s)
-    .pref_comp_mbps = 710.712300   // CMP  (MB/s)
+    .pref_integer_mips = 2255.066,
+    .pref_float_mflops = 904.596,
+    .pref_mem_mbps = 10195.801,
+    .pref_aes_mbps = 1682.464,
+    .pref_comp_mbps = 721.390,
+    .pref_latency_mops = 468.004
 };
 
-
 const BenchRefs* bench_refs_defaults(void) { return &REFS; }
-
-//random and sequencial for memory access and test

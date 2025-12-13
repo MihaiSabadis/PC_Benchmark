@@ -6,6 +6,7 @@ typedef struct {
     double pref_mem_mbps;       // MB/s  (Triad)
     double pref_aes_mbps;       // MB/s  (encrypt)
     double pref_comp_mbps;      // MB/s  (avg of comp+decomp)
+	double pref_latency_mops;   // MOPS (Memory Latency)
 } BenchRefs;
 
 #ifdef __cplusplus
