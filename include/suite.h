@@ -22,3 +22,4 @@ typedef void (*StatusCallback)(int progress, double score);
 
 API void run_test_by_id(int id, StatusCallback cb);
 API double get_test_reference(int id);
+API void suite_run_all(void);
