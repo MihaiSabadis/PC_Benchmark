@@ -28,7 +28,7 @@ class BenchConfig(ctypes.Structure):
         ("triad_N", ctypes.c_size_t),
         ("aes_bytes", ctypes.c_size_t),
         ("comp_bytes", ctypes.c_size_t),
-        ("disk_io_bytes", ctypes.c_size_t)
+        ("disk_bytes", ctypes.c_size_t)
     ]
 
 # --- LOAD DLL ---
@@ -133,7 +133,7 @@ class BenchmarkApp(ctk.CTk):
 
         self.buttons = {}
         # Create buttons for basic tests (Skip Memory ID 2/5, we handle it specially)
-        test_ids = [0, 1, 3, 4] 
+        test_ids = [0, 1, 3, 4, 6] 
         for tid in test_ids:
             btn = ctk.CTkButton(self.sidebar, text=TESTS[tid].split()[0], 
                                 command=lambda i=tid: self.run_test(i))
@@ -202,7 +202,7 @@ class BenchmarkApp(ctk.CTk):
             f"Memory Array:  {cfg.triad_N:,} elems\n"
             f"AES Data:      {to_mb(cfg.aes_bytes)}\n"
             f"Compress Data: {to_mb(cfg.comp_bytes)}\n"
-            f"Disk Data:     {to_mb(cfg.disk_bytes)}\n"
+            f"Disk Data:     {to_mb(cfg.disk_bytes)}"
         )
         self.lbl_cfg_details.configure(text=text)
 
