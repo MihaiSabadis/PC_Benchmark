@@ -19,6 +19,7 @@ typedef void (*StatusCallback)(int progress, double score);
 #define TEST_AES     3
 #define TEST_COMP    4
 #define TEST_MEMORY_LATENCY 5
+#define TEST_DISK    6
 
 API void run_test_by_id(int id, StatusCallback cb);
 API double get_test_reference(int id);

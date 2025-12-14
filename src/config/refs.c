@@ -8,7 +8,8 @@ static const BenchRefs REFS = {
     .pref_mem_mbps = 10195.801,
     .pref_aes_mbps = 1682.464,
     .pref_comp_mbps = 721.390,
-    .pref_latency_mops = 468.004
+    .pref_latency_mops = 468.004,
+	.pref_disk_mbps = 300.0
 };
 
 const BenchRefs* bench_refs_defaults(void) { return &REFS; }

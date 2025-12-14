@@ -13,7 +13,8 @@ TESTS = {
     2: "Memory Bandwidth (MB/s)",
     3: "AES (MB/s)",
     4: "Compression (MB/s)",
-    5: "Memory Latency (MOPS)" # New Random Access Test
+    5: "Memory Latency (MOPS)",
+    6: "Disk I/O (MB/s)"
 }
 
 # --- C STRUCTURE MAPPING ---
@@ -26,7 +27,8 @@ class BenchConfig(ctypes.Structure):
         ("float_N", ctypes.c_size_t),
         ("triad_N", ctypes.c_size_t),
         ("aes_bytes", ctypes.c_size_t),
-        ("comp_bytes", ctypes.c_size_t)
+        ("comp_bytes", ctypes.c_size_t),
+        ("disk_io_bytes", ctypes.c_size_t)
     ]
 
 # --- LOAD DLL ---
@@ -199,7 +201,8 @@ class BenchmarkApp(ctk.CTk):
             f"Float Count:   {cfg.float_N:,} elems\n"
             f"Memory Array:  {cfg.triad_N:,} elems\n"
             f"AES Data:      {to_mb(cfg.aes_bytes)}\n"
-            f"Compress Data: {to_mb(cfg.comp_bytes)}"
+            f"Compress Data: {to_mb(cfg.comp_bytes)}\n"
+            f"Disk Data:     {to_mb(cfg.disk_bytes)}\n"
         )
         self.lbl_cfg_details.configure(text=text)
 
@@ -279,7 +282,7 @@ class BenchmarkApp(ctk.CTk):
     def _run_full_sequence(self):
         # Run standard set (0,1,2,3,4)
         # Note: 2 is Seq Memory. If you want Random, add 5.
-        ids_to_run = [0, 1, 2, 3, 4] 
+        ids_to_run = [0, 1, 2, 3, 4, 5, 6] 
         for tid in ids_to_run:
             self.after(0, self.log, f"Running {TESTS[tid]}...")
             self.results[tid] = []

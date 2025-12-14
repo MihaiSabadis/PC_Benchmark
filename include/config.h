@@ -21,6 +21,7 @@ typedef struct {
     size_t triad_N;               // elements for Triad
     size_t aes_bytes;             // V_data for AES
     size_t comp_bytes;            // V_data for Compression
+	size_t disk_bytes;            // total bytes for Disk I/O
 } BenchConfig;
 
 #ifdef __cplusplus

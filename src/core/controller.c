@@ -14,5 +14,4 @@ void run_suite(void) {
 
 void run_single(const char* test_id) {
     printf("[Controller] Running single test: %s\n", test_id ? test_id : "(null)");
-    // (we'll hook this into Suite later)
 }

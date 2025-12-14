@@ -10,12 +10,11 @@
 #include "memory_triad.h"
 #include "aes_throughput.h"
 #include "compress_throughput.h"
+#include "disk_sys.h"
 
 #include "report_csv.h"
 
-
-// --- types first (before any use) -------------------------------------------
-typedef enum { PREF_INT, PREF_FP, PREF_MEM, PREF_AES, PREF_COMP, PREF_LATENCY } PrefKind;
+typedef enum { PREF_INT, PREF_FP, PREF_MEM, PREF_AES, PREF_COMP, PREF_LATENCY, PREF_DISK } PrefKind;
 
 typedef struct {
     const char* id;
@@ -32,7 +31,8 @@ static double pick_pref(PrefKind k, const BenchRefs* r) {
     case PREF_MEM:  return r->pref_mem_mbps;
     case PREF_AES:  return r->pref_aes_mbps;
     case PREF_COMP: return r->pref_comp_mbps;
-	case PREF_LATENCY: return 1.0; // Placeholder for latency
+	case PREF_LATENCY: return r ->pref_latency_mops; // Placeholder for latency
+	case PREF_DISK: return r->pref_disk_mbps;
     default:        return 1.0;
     }
 }
@@ -95,6 +95,11 @@ void run_test_by_id(int id, StatusCallback cb) {
             score = memory_random_mops_once();
             break;
 
+        case TEST_DISK:
+            if (r == 0) disk_benchmark_mbps_once();
+            score = disk_benchmark_mbps_once();
+			break;
+
         default:
             score = 0.0;
             break;
@@ -114,10 +119,10 @@ API double get_test_reference(int id) {
     case TEST_AES:     return refs->pref_aes_mbps;
     case TEST_COMP:    return refs->pref_comp_mbps;
     case TEST_MEMORY_LATENCY: return refs->pref_latency_mops;
+    case TEST_DISK:    return refs->pref_disk_mbps;
     default: return 1.0;
     }
 }
-
 
 
 void suite_run_all(void) {
@@ -131,7 +136,8 @@ void suite_run_all(void) {
         { "MEM", "Memory TRIAD (A=B+s*C)",   "MB/s",   PREF_MEM,  memory_mbps_once },
         { "AES", "AES-128 ECB (throughput)", "MB/s",   PREF_AES,  aes_mbps_once },
         { "CMP", "DEFLATE-style codec",      "MB/s",   PREF_COMP, compress_mbps_once },
-        { "RND", "Memory Random Latency",    "MOPS",   (PrefKind)TEST_MEMORY_LATENCY, memory_random_mops_once }
+        { "RND", "Memory Random Latency",    "MOPS",   PREF_LATENCY, memory_random_mops_once },
+		{ "DSK", "Disk I/O Throughput",     "MB/s",   PREF_DISK, disk_benchmark_mbps_once }
     };
     const int T = (int)(sizeof(tests) / sizeof(tests[0]));
 
@@ -143,15 +149,11 @@ void suite_run_all(void) {
     //Open
     FILE* csv = report_csv_begin("results/run.csv");
 
-
-
     for (int t = 0; t < T; ++t) {
         const TestEntry* e = &tests[t];
 
         // warm-up (unmeasured)
         for (int w = 0; w < cfg->warmup; ++w) (void)e->once();
-
-        
 
         double sum = 0.0, minv = DBL_MAX, maxv = 0.0;
         for (int r = 0; r < cfg->repetitionsK; ++r) {
@@ -163,8 +165,6 @@ void suite_run_all(void) {
 
             
         }
-
-        
 
         const double avg = sum / (double)cfg->repetitionsK;
         const double pref = pick_pref(e->prefk, ref);
