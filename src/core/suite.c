@@ -57,7 +57,8 @@ void suite_run_with_callback(StatusCallback cb) {
 }
 
 void run_test_by_id(int id, StatusCallback cb) {
-    const int K = 5;
+    const BenchConfig* cfg = bench_config_defaults();
+    const int K = cfg->repetitionsK;
 
     for (int r = 0; r < K; ++r) {
         double score = 0.0;

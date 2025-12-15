@@ -26,7 +26,6 @@ add_library(pcbench SHARED
     ${SRC_REPORT}
     ${SRC_CONFIG}
     ${SRC_UTILS}
-    # Removed manual duplicates here (disk_sys.c, refs.c, etc. are already in the lists above)
 )
 
 target_include_directories(pcbench PUBLIC ${PUBLIC_INC})

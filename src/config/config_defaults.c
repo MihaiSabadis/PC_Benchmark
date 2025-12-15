@@ -18,7 +18,7 @@ BenchConfig* bench_config_defaults(void) { return &CFG; }
 void set_config_profile(int profile_id) {
     switch (profile_id) {
     case 0: // QUICK / DEMO
-        CFG.repetitionsK = 2;
+        CFG.repetitionsK = 10;
         CFG.integer_block_bytes = 16ull * 1024ull * 1024ull; // 16 MB
         CFG.integer_passes = 2;
         CFG.float_N = 1048576ull;         // 1 Mi elements
@@ -29,7 +29,7 @@ void set_config_profile(int profile_id) {
         break;
 
     case 2: // EXTREME / STRESS
-        CFG.repetitionsK = 10;
+        CFG.repetitionsK = 50;
         CFG.integer_block_bytes = 256ull * 1024ull * 1024ull; // 256 MB
         CFG.integer_passes = 8;
         CFG.float_N = 16777216ull;        // 16 Mi elements
@@ -41,7 +41,7 @@ void set_config_profile(int profile_id) {
 
     case 1: // STANDARD (Default)
     default:
-        CFG.repetitionsK = 5;
+        CFG.repetitionsK = 25;
         CFG.integer_block_bytes = 64ull * 1024ull * 1024ull;
         CFG.integer_passes = 4;
         CFG.float_N = 4194304ull;

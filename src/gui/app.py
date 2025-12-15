@@ -6,6 +6,12 @@ import customtkinter as ctk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+REF_SPECS = """Reference System (Grade 10.0):
+OS:  Windows 11 Pro
+CPU: Intel Core i7-12700H (14 Cores), 20 logical processors
+GPU: NVIDIA GeForce RTX 3060 Laptop
+RAM: 16.0 GB DDR5"""
+
 # --- CONFIGURATION CONSTANTS ---
 TESTS = {
     0: "Integer (MIPS)",
@@ -85,7 +91,8 @@ class BenchmarkApp(ctk.CTk):
         
         # Initial Data Load
         self.fetch_system_info()
-        self.update_config_display() # Show default values
+        self.update_config_display()
+        self.change_profile("Standard")
 
     def setup_sidebar(self):
         self.sidebar = ctk.CTkFrame(self, width=250, corner_radius=0)
@@ -94,6 +101,16 @@ class BenchmarkApp(ctk.CTk):
         # 1. Header
         self.logo = ctk.CTkLabel(self.sidebar, text="SCS BENCHMARK", font=("Roboto", 22, "bold"))
         self.logo.pack(pady=(30, 10))
+
+        # Grade
+        self.lbl_grade = ctk.CTkLabel(self.sidebar, text="Grade: -- / 10", text_color="#00FF00", font=("Arial", 24, "bold"))
+        self.lbl_grade.pack(pady=5)
+
+        #Note
+        self.lbl_ref_note = ctk.CTkLabel(self.sidebar, 
+                                 text="(10.0 = Reference PC)", 
+                                 font=("Arial", 10), text_color="gray")
+        self.lbl_ref_note.pack(pady=0)
 
         self.lbl_sysinfo = ctk.CTkLabel(self.sidebar, text="Loading info...", 
                                         font=("Arial", 12), text_color="gray")
@@ -151,9 +168,6 @@ class BenchmarkApp(ctk.CTk):
                                       height=40, font=("Arial", 14, "bold"),
                                       command=self.run_full_suite)
         self.btn_full.pack(padx=20, pady=10)
-        
-        self.lbl_grade = ctk.CTkLabel(self.sidebar, text="Grade: -- / 10", font=("Arial", 20, "bold"))
-        self.lbl_grade.pack(pady=20, side="bottom")
 
     def setup_main_area(self):
         self.main_frame = ctk.CTkFrame(self)
@@ -219,11 +233,28 @@ class BenchmarkApp(ctk.CTk):
         self.run_test(tid)
 
     def fetch_system_info(self):
+        # 1. Get User's Info from C
         try:
             buf = ctypes.create_string_buffer(512)
             lib.get_system_info_str(buf, 512)
-            self.lbl_sysinfo.configure(text=buf.value.decode("utf-8"))
-        except: pass
+            user_specs = buf.value.decode("utf-8")
+            
+            # Update the Sidebar Label (Short version)
+            self.lbl_sysinfo.configure(text=user_specs)
+            
+            # 2. Print Detailed Comparison to Log
+            self.log("="*40)
+            self.log("      SYSTEM COMPARISON")
+            self.log("="*40)
+            self.log(f"[YOUR SYSTEM]\n{user_specs}\n")
+            self.log("-" * 20)
+            self.log(f"[{REF_SPECS}]\n")
+            self.log("="*40)
+            self.log("Ready to benchmark.\n")
+            
+        except Exception as e:
+            self.log(f"Error fetching system info: {e}")
+            self.lbl_sysinfo.configure(text="System Info Error")
 
     def log(self, msg):
         self.log_box.insert("end", msg + "\n")
@@ -233,10 +264,13 @@ class BenchmarkApp(ctk.CTk):
         tname = TESTS.get(test_id, "Unknown")
         self.log(f"--- Starting {tname} ---")
         self.results[test_id] = []
-        
+
         self.ax.clear()
-        self.ax.set_title(f"{tname} Evolution")
-        self.ax.set_ylabel("Throughput / Score")
+        self.ax.set_title(f"{tname} Real-Time Evolution", color='#00E5FF', fontsize=12, fontweight='bold')
+        self.ax.set_ylabel("Throughput", color='gray')
+        self.ax.set_facecolor('#2b2b2b')
+        self.ax.grid(True, linestyle=':', alpha=0.3, color='gray')
+        
         self.canvas.draw()
         
         threading.Thread(target=self._run_c_logic, args=(test_id,)).start()
@@ -250,30 +284,84 @@ class BenchmarkApp(ctk.CTk):
     def update_data(self, test_id, run, score):
         self.results[test_id].append(score)
         
+        # X-Axis: 1 to 50
         runs = range(1, len(self.results[test_id])+1)
+        
         self.ax.clear()
-        self.ax.plot(runs, self.results[test_id], marker='o', color='#1f6aa5')
-        self.ax.set_title(TESTS.get(test_id, ""))
-        self.ax.grid(True, alpha=0.3)
+        
+        # --- LINE GRAPH RESTORED ---
+        # We use a Cyan line with markers. As points get added, it flows.
+        self.ax.plot(runs, self.results[test_id], 
+                     color='#00E5FF',      # Cyan Line
+                     marker='.',           # Small dots
+                     linestyle='-',        # Connected line
+                     linewidth=1.5,        # Thin, precise line
+                     alpha=0.9)            # Slight transparency
+
+        # Fill under the line for a "Cyberpunk" monitor look
+        self.ax.fill_between(runs, self.results[test_id], color='#00E5FF', alpha=0.1)
+
+        # --- TEXT STYLING ---
+        tname = TESTS.get(test_id, "")
+        self.ax.set_title(f"{tname}", color='#00E5FF', fontsize=12, fontweight='bold')
+        self.ax.set_xlabel("Samples (Time)", color='gray', fontsize=9)
+        
+        # Dynamic Y-Axis scaling so the line doesn't jump too much
+        if len(self.results[test_id]) > 1:
+            # Zoom in slightly to show variation
+            low = min(self.results[test_id]) * 0.95
+            high = max(self.results[test_id]) * 1.05
+            self.ax.set_ylim(bottom=low, top=high)
+
+        self.ax.grid(axis='both', linestyle=':', alpha=0.3, color='gray')
         self.canvas.draw()
         
         self.log(f"Run {run}: {score:,.1f}")
 
-        if run == 5: 
+        # Check against the configured repetitions (which is now 50)
+        cfg_ptr = lib.bench_config_defaults()
+        max_runs = cfg_ptr.contents.repetitionsK
+        
+        if run == max_runs: 
              self.calculate_final_grade()
 
     def calculate_final_grade(self):
+        print("--- DEBUG: STARTING GRADE CALCULATION ---")
         total_ratio = 0
         count = 0
+        
+        # Iterate through all results
         for tid, scores in self.results.items():
-            if not scores: continue
+            if not scores: 
+                print(f"Skipping Test ID {tid} (No scores)")
+                continue
+                
             best = max(scores)
             ref = lib.get_test_reference(tid)
+            
+            print(f"Test ID: {tid} | Your Score: {best:.2f} | Reference: {ref:.2f}")
+            
+            # Check for valid reference AND valid score
             if ref > 0:
-                total_ratio += (best / ref)
+                ratio = best / ref
+                total_ratio += ratio
                 count += 1
+                print(f"   -> Added Ratio: {ratio:.4f}")
+            else:
+                print("   -> IGNORED (Reference is 0)")
+
+        print(f"--- SUMMARY: Count={count}, TotalRatio={total_ratio:.4f} ---")
+
         if count > 0:
-            self.lbl_grade.configure(text=f"Grade: {(total_ratio/count)*10.0:.2f} / 10")
+            final_grade = (total_ratio / count) * 10.0
+            print(f"✅ CALCULATED GRADE: {final_grade:.2f}")
+            
+            # FORCE UI UPDATE
+            new_text = f"Grade: {final_grade:.2f} / 10"
+            self.lbl_grade.configure(text=new_text)
+            self.lbl_grade.update() # Force redraw immediately
+        else:
+            print("❌ NO VALID TESTS FOUND FOR GRADE")
 
     def run_full_suite(self):
         self.log(">>> FULL SUITE START <<<")
