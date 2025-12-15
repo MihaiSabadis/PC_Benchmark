@@ -1,5 +1,6 @@
 ﻿import ctypes
 import os
+import platform
 import threading
 import time
 import customtkinter as ctk
@@ -40,14 +41,24 @@ class BenchConfig(ctypes.Structure):
 # --- LOAD DLL ---
 def get_dll_path(dll_name):
     import sys
+    system = platform.system()
+    if system == "Windows":
+        real_name = dll_name
+    elif system == "Darwin": # macOS
+        real_name = "lib" + dll_name.replace(".dll", ".dylib")
+    elif system == "Linux":
+        real_name = "lib" + dll_name.replace(".dll", ".so")
+    else:
+        real_name = dll_name # Fallback
+
     if getattr(sys, 'frozen', False):
         return os.path.join(sys._MEIPASS, dll_name)
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
     possible_paths = [
-        "../../out/build/x64-Release/bin/" + dll_name,
-        "../../out/build/x64-Debug/bin/" + dll_name,
-        "../../bin/" + dll_name
+        "../../out/build/x64-Release/bin/" + real_name, # Visual Studio
+        "../../build/" + real_name,                     # Standard CMake (Mac/Linux)
+        "../../bin/" + real_name                        # Generic bin
     ]
     for p in possible_paths:
         full_p = os.path.abspath(os.path.join(current_dir, p))

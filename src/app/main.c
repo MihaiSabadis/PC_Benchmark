@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "controller.h"
 #include "sysinfo.h"  // <--- You must include this to see get_system_info_str
+#include "config.h"
 
 int main(void) {
     // 1. Get the system info string
