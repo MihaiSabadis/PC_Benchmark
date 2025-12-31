@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include "sysinfo.h"
 
-// ==========================================
+
 // WINDOWS IMPLEMENTATION
-// ==========================================
 #ifdef _WIN32
 #include <windows.h>
 #include <intrin.h>
@@ -66,9 +65,7 @@ API void get_system_info_str(char* buffer, int max_len) {
         os_name, cpu_brand, num_cores, gpu_name, ram_gb);
 }
 
-// ==========================================
 // LINUX & MACOS IMPLEMENTATION
-// ==========================================
 #else
 #include <unistd.h>
 #include <sys/utsname.h>

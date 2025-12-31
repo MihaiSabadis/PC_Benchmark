@@ -1,4 +1,4 @@
-// src/core/suite.c
+
 #include <stdio.h>
 #include <float.h>
 #include "suite.h"
@@ -31,7 +31,7 @@ static double pick_pref(PrefKind k, const BenchRefs* r) {
     case PREF_MEM:  return r->pref_mem_mbps;
     case PREF_AES:  return r->pref_aes_mbps;
     case PREF_COMP: return r->pref_comp_mbps;
-	case PREF_LATENCY: return r ->pref_latency_mops; // Placeholder for latency
+	case PREF_LATENCY: return r ->pref_latency_mops;
 	case PREF_DISK: return r->pref_disk_mbps;
     default:        return 1.0;
     }
@@ -40,10 +40,10 @@ static double pick_pref(PrefKind k, const BenchRefs* r) {
 void suite_run_with_callback(StatusCallback cb) {
     const int K = 5;
 
-    // 1. Warm-up (optional, same as before)
+    //Warm-up
     (void)integer_mips_once();
 
-    // 2. The Loop
+    
     for (int r = 0; r < K; ++r) {
         double mips = integer_mips_once();
 

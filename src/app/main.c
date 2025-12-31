@@ -4,7 +4,7 @@
 #include "config.h"
 
 int main(void) {
-    // 1. Get and print system info (Keep exactly what you had)
+    // 1. Get and print system info
     char info_buffer[512];
     get_system_info_str(info_buffer, sizeof(info_buffer));
     printf("=== System Info ===\n%s\n\n", info_buffer);

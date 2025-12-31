@@ -12,10 +12,10 @@ include_directories(${PUBLIC_INC})
 # --- SOURCES (Automatically finds all .c files) ---
 file(GLOB SRC_APP      ${CMAKE_SOURCE_DIR}/src/app/*.c)
 file(GLOB SRC_CORE     ${CMAKE_SOURCE_DIR}/src/core/*.c)
-file(GLOB SRC_MODULES  ${CMAKE_SOURCE_DIR}/src/modules/*.c) # Includes disk_sys.c
+file(GLOB SRC_MODULES  ${CMAKE_SOURCE_DIR}/src/modules/*.c)
 file(GLOB SRC_PIPELINE ${CMAKE_SOURCE_DIR}/src/pipeline/*.c)
 file(GLOB SRC_REPORT   ${CMAKE_SOURCE_DIR}/src/report/*.c)
-file(GLOB SRC_CONFIG   ${CMAKE_SOURCE_DIR}/src/config/*.c)  # Includes refs.c, defaults.c
+file(GLOB SRC_CONFIG   ${CMAKE_SOURCE_DIR}/src/config/*.c)
 file(GLOB SRC_UTILS    ${CMAKE_SOURCE_DIR}/src/utils/*.c)
 
 # --- 1. BUILD THE SHARED LIBRARY ---
@@ -31,6 +31,5 @@ add_library(pcbench SHARED
 target_include_directories(pcbench PUBLIC ${PUBLIC_INC})
 
 # --- 2. BUILD THE CLI APP ---
-# Correct: Only SRC_APP (main.c) goes here. disk_sys.c is inside the library.
 add_executable(pc-bench-cli ${SRC_APP})
 target_link_libraries(pc-bench-cli PRIVATE pcbench)

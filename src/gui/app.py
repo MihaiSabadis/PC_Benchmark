@@ -89,7 +89,7 @@ class BenchmarkApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.geometry("1200x800")
-        self.title("SCS PC Benchmark - Team 30431")
+        self.title("SCS PC Benchmark")
         ctk.set_appearance_mode("Dark")
 
         self.grid_columnconfigure(1, weight=1)
@@ -160,7 +160,7 @@ class BenchmarkApp(ctk.CTk):
         self.switch_mem.pack(padx=20, pady=5)
 
         self.buttons = {}
-        # Create buttons for basic tests (Skip Memory ID 2/5, we handle it specially)
+        # Create buttons for basic tests
         test_ids = [0, 1, 3, 4, 6] 
         for tid in test_ids:
             btn = ctk.CTkButton(self.sidebar, text=TESTS[tid].split()[0], 
