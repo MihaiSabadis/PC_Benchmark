@@ -13,7 +13,7 @@ CPU: Intel Core i7-12700H (14 Cores), 20 logical processors
 GPU: NVIDIA GeForce RTX 3060 Laptop
 RAM: 16.0 GB DDR5"""
 
-# --- CONFIGURATION CONSTANTS ---
+# Tests Names
 TESTS = {
     0: "Integer (MIPS)",
     1: "Float (MFLOPS)",
@@ -24,7 +24,7 @@ TESTS = {
     6: "Disk I/O (MB/s)"
 }
 
-# --- C STRUCTURE MAPPING ---
+# C Struct Definition 
 class BenchConfig(ctypes.Structure):
     _fields_ = [
         ("repetitionsK", ctypes.c_int),
@@ -38,7 +38,7 @@ class BenchConfig(ctypes.Structure):
         ("disk_bytes", ctypes.c_size_t)
     ]
 
-# --- LOAD DLL ---
+# Load DLL
 def get_dll_path(dll_name):
     import sys
     system = platform.system()
@@ -73,7 +73,7 @@ if not dll_path:
 
 lib = ctypes.CDLL(dll_path)
 
-# --- DEFINE C SIGNATURES ---
+# Define C signatures
 CALLBACK_TYPE = ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_double)
 
 lib.run_test_by_id.argtypes = [ctypes.c_int, CALLBACK_TYPE]
@@ -109,7 +109,7 @@ class BenchmarkApp(ctk.CTk):
         self.sidebar = ctk.CTkFrame(self, width=250, corner_radius=0)
         self.sidebar.grid(row=0, column=0, sticky="nsew")
         
-        # 1. Header
+        # Header
         self.logo = ctk.CTkLabel(self.sidebar, text="SCS BENCHMARK", font=("Roboto", 22, "bold"))
         self.logo.pack(pady=(30, 10))
 
@@ -117,7 +117,7 @@ class BenchmarkApp(ctk.CTk):
         self.lbl_grade = ctk.CTkLabel(self.sidebar, text="Grade: -- / 10", text_color="#00FF00", font=("Arial", 24, "bold"))
         self.lbl_grade.pack(pady=5)
 
-        #Note
+        # Little Note (observation)
         self.lbl_ref_note = ctk.CTkLabel(self.sidebar, 
                                  text="(10.0 = Reference PC)", 
                                  font=("Arial", 10), text_color="gray")
@@ -129,7 +129,7 @@ class BenchmarkApp(ctk.CTk):
 
         ctk.CTkFrame(self.sidebar, height=2, fg_color="gray40").pack(fill="x", pady=10, padx=20)
 
-        # 2. PROFILE SELECTOR
+        # Profile selection
         self.lbl_profile = ctk.CTkLabel(self.sidebar, text="Test Profile:", font=("Arial", 14, "bold"))
         self.lbl_profile.pack(padx=20, pady=(5,0), anchor="w")
 
@@ -138,7 +138,7 @@ class BenchmarkApp(ctk.CTk):
                                              command=self.change_profile, variable=self.profile_var)
         self.opt_profile.pack(padx=20, pady=5)
 
-        # 3. CONFIG DISPLAY BOX
+        # Display box (looks like a terminal)
         self.frm_config = ctk.CTkFrame(self.sidebar, fg_color="#333333")
         self.frm_config.pack(padx=20, pady=10, fill="x")
         
@@ -148,7 +148,7 @@ class BenchmarkApp(ctk.CTk):
 
         ctk.CTkFrame(self.sidebar, height=2, fg_color="gray40").pack(fill="x", pady=10, padx=20)
 
-        # 4. TEST BUTTONS
+        # Test Buttons
         self.lbl_tests = ctk.CTkLabel(self.sidebar, text="Run Tests:", anchor="w", font=("Arial", 14, "bold"))
         self.lbl_tests.pack(padx=20, pady=(5,5), fill="x")
         
@@ -199,17 +199,17 @@ class BenchmarkApp(ctk.CTk):
         self.log_box = ctk.CTkTextbox(self.main_frame, height=150, font=("Consolas", 12))
         self.log_box.pack(fill="x", pady=10)
 
-    # --- LOGIC ---
+    # LOGIC---------
 
     def change_profile(self, selection):
         map_prof = {"Quick": 0, "Standard": 1, "Extreme": 2}
         pid = map_prof.get(selection, 1)
         
-        # 1. Update C Core
+        # Update C Core
         lib.set_config_profile(pid)
         self.log(f"Profile changed to: {selection}")
         
-        # 2. Update Display
+        # Update Display
         self.update_config_display()
 
     def update_config_display(self):
@@ -244,7 +244,7 @@ class BenchmarkApp(ctk.CTk):
         self.run_test(tid)
 
     def fetch_system_info(self):
-        # 1. Get User's Info from C
+        # Get User's Info from C
         try:
             buf = ctypes.create_string_buffer(512)
             lib.get_system_info_str(buf, 512)
@@ -253,7 +253,7 @@ class BenchmarkApp(ctk.CTk):
             # Update the Sidebar Label (Short version)
             self.lbl_sysinfo.configure(text=user_specs)
             
-            # 2. Print Detailed Comparison to Log
+            # Print Detailed Comparison to Log
             self.log("="*40)
             self.log("      SYSTEM COMPARISON")
             self.log("="*40)
@@ -295,12 +295,12 @@ class BenchmarkApp(ctk.CTk):
     def update_data(self, test_id, run, score):
         self.results[test_id].append(score)
         
-        # X-Axis: 1 to 50
+        # X-Axis
         runs = range(1, len(self.results[test_id])+1)
         
         self.ax.clear()
         
-        # --- LINE GRAPH RESTORED ---
+        # Line Graph
         # We use a Cyan line with markers. As points get added, it flows.
         self.ax.plot(runs, self.results[test_id], 
                      color='#00E5FF',      # Cyan Line
@@ -309,10 +309,10 @@ class BenchmarkApp(ctk.CTk):
                      linewidth=1.5,        # Thin, precise line
                      alpha=0.9)            # Slight transparency
 
-        # Fill under the line for a "Cyberpunk" monitor look
+        # Fill under the line for an aesthetic monitor look
         self.ax.fill_between(runs, self.results[test_id], color='#00E5FF', alpha=0.1)
 
-        # --- TEXT STYLING ---
+        # Text styling
         tname = TESTS.get(test_id, "")
         self.ax.set_title(f"{tname}", color='#00E5FF', fontsize=12, fontweight='bold')
         self.ax.set_xlabel("Samples (Time)", color='gray', fontsize=9)
@@ -329,7 +329,7 @@ class BenchmarkApp(ctk.CTk):
         
         self.log(f"Run {run}: {score:,.1f}")
 
-        # Check against the configured repetitions (which is now 50)
+        # Check against the configured repetitions
         cfg_ptr = lib.bench_config_defaults()
         max_runs = cfg_ptr.contents.repetitionsK
         
@@ -367,7 +367,7 @@ class BenchmarkApp(ctk.CTk):
             final_grade = (total_ratio / count) * 10.0
             print(f"✅ CALCULATED GRADE: {final_grade:.2f}")
             
-            # FORCE UI UPDATE
+            # Update Grade Label
             new_text = f"Grade: {final_grade:.2f} / 10"
             self.lbl_grade.configure(text=new_text)
             self.lbl_grade.update() # Force redraw immediately
@@ -378,9 +378,7 @@ class BenchmarkApp(ctk.CTk):
         self.log(">>> FULL SUITE START <<<")
         threading.Thread(target=self._run_full_sequence).start()
 
-    def _run_full_sequence(self):
-        # Run standard set (0,1,2,3,4)
-        # Note: 2 is Seq Memory. If you want Random, add 5.
+    def _run_full_sequence(self):        
         ids_to_run = [0, 1, 2, 3, 4, 5, 6] 
         for tid in ids_to_run:
             self.after(0, self.log, f"Running {TESTS[tid]}...")

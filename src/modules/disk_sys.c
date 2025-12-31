@@ -13,7 +13,7 @@ double disk_benchmark_mbps_once(void) {
     char* buffer = (char*)malloc(CHUNK_SIZE);
     if (!buffer) return 0.0;
 
-    // --- PHASE 1: WRITE ---
+    // Write
     FILE* f = fopen(filename, "wb");
     if (!f) { free(buffer); return 0.0; }
 
@@ -24,7 +24,7 @@ double disk_benchmark_mbps_once(void) {
     double t_write = timer_elapsed_seconds();
     fclose(f);
 
-    // --- PHASE 2: READ ---
+    // Read
     f = fopen(filename, "rb");
     if (!f) { free(buffer); return 0.0; }
 

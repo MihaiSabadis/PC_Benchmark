@@ -1,6 +1,5 @@
 #include "config.h"
 
-// Remove 'const' so we can modify it
 static BenchConfig CFG = {
     .repetitionsK = 5,
     .warmup = 1,

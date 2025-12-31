@@ -40,14 +40,14 @@ static double pick_pref(PrefKind k, const BenchRefs* r) {
 void suite_run_with_callback(StatusCallback cb) {
     const int K = 5;
 
-    //Warm-up
+    // Warm-up
     (void)integer_mips_once();
 
     
     for (int r = 0; r < K; ++r) {
         double mips = integer_mips_once();
 
-        // 3. SEND DATA TO PYTHON
+        // SEND DATA TO PYTHON
         // If the callback 'cb' is not NULL, call it!
         if (cb != NULL) {
             // Passing: progress (r+1), and the score (mips)
@@ -70,7 +70,6 @@ void run_test_by_id(int id, StatusCallback cb) {
             break;
 
         case TEST_FLOAT:
-            // Assuming you have this function in src/modules/float_dot.c
             if (r == 0) float_mflops_once();
             score = float_mflops_once();
             break;
@@ -90,9 +89,7 @@ void run_test_by_id(int id, StatusCallback cb) {
             score = compress_mbps_once();
             break;
 
-        case TEST_MEMORY_LATENCY: // <--- Used proper ID here
-            // Make sure memory_random_mops_once is declared in memory_triad.h
-            // if (r == 0) memory_random_mops_once(); // Optional warmup
+        case TEST_MEMORY_LATENCY:
             score = memory_random_mops_once();
             break;
 

@@ -2,18 +2,17 @@
 #include <stdint.h>
 #include "timer.h"
 #include "config.h"
-
-static inline uint32_t rotl32(uint32_t x, int r) { return (x << r) | (x >> (32 - r)); }
+#include "util.h"
 
 double aes_mbps_once(void) {
-    const size_t V = bench_config_defaults()->aes_bytes;           // total bytes
+    const size_t V = bench_config_defaults()->aes_bytes; // total bytes
     uint8_t* buf = (uint8_t*)malloc(V);
     if (!buf) return 0.0;
 
     // init not timed
     for (size_t i = 0; i < V; i++) buf[i] = (uint8_t)(i * 131u);
 
-    // --- timing: simulate 10 "rounds" over 16B blocks (ECB-like, no I/O) ---
+    // timing: simulate 10 "rounds" over 16B blocks (ECB-like, no I/O)
     timer_start();
     for (size_t off = 0; off + 16 <= V; off += 16) {
         uint32_t* w = (uint32_t*)(buf + off);

@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include "controller.h"
 #include "suite.h"
-
-//includes for beta
 #include "config.h"
 #include "refs.h"
 

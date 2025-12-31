@@ -89,14 +89,14 @@ static void get_cmd_output(const char* cmd, char* buffer, int max_len) {
 }
 
 API void get_system_info_str(char* buffer, int max_len) {
-    // 1. OS Name (Kernel version)
+    // OS Name (Kernel version)
     struct utsname os_info;
     char os_str[128] = "Linux/Unix";
     if (uname(&os_info) == 0) {
         snprintf(os_str, sizeof(os_str), "%s %s", os_info.sysname, os_info.release);
     }
 
-    // 2. CPU Model & Cores
+    // CPU Model & Cores
     char cpu_model[128] = "Unknown CPU";
     long num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 
@@ -107,12 +107,12 @@ API void get_system_info_str(char* buffer, int max_len) {
     get_cmd_output("sysctl -n machdep.cpu.brand_string", cpu_model, sizeof(cpu_model));
 #endif
 
-    // 3. RAM Size
+    // RAM Size
     long pages = sysconf(_SC_PHYS_PAGES);
     long page_size = sysconf(_SC_PAGE_SIZE);
     double ram_gb = (double)(pages * page_size) / (1024.0 * 1024.0 * 1024.0);
 
-    // 4. GPU (Tricky on Linux, requires tools like lspci)
+    // GPU (Tricky on Linux, requires tools like lspci)
     char gpu_name[128] = "Unknown (requires lspci)";
 #ifdef __linux__
     // Try to get the first VGA compatible controller

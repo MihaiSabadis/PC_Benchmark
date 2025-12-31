@@ -1,4 +1,3 @@
-// src/modules/compress_throughput.c
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
