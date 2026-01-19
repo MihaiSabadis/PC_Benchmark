@@ -4,24 +4,31 @@
 #include "config.h"
 
 int main(void) {
-    // 1. Get and print system info
+    // Get and print system info
     char info_buffer[512];
     get_system_info_str(info_buffer, sizeof(info_buffer));
     printf("=== System Info ===\n%s\n\n", info_buffer);
 
-    // 2. Run Profile 0: Quick
-    printf("\n>>> RUNNING PROFILE: QUICK (0) <<<\n");
-    set_config_profile(0);
-    run_suite();
+    
+    int profile = -1;
+    printf("Choose profile to run:\n");
+    printf("  0 - QUICK\n");
+    printf("  1 - STANDARD\n");
+    printf("  2 - EXTREME\n");
+    printf("Enter profile id (0/1/2): ");
+    if (scanf("%d", &profile) != 1) {
+        fprintf(stderr, "Invalid input.\n");
+        return 1;
+    }
+    if (profile < 0 || profile > 2) {
+        fprintf(stderr, "Profile id must be 0, 1, or 2.\n");
+        return 1;
+    }
 
-    // 3. Run Profile 1: Standard
-    printf("\n>>> RUNNING PROFILE: STANDARD (1) <<<\n");
-    set_config_profile(1);
-    run_suite();
-
-    // 4. Run Profile 2: Extreme
-    printf("\n>>> RUNNING PROFILE: EXTREME (2) <<<\n");
-    set_config_profile(2);
+    
+    const char* names[] = { "QUICK (0)", "STANDARD (1)", "EXTREME (2)" };
+    printf("\n>>> RUNNING PROFILE: %s <<<\n", names[profile]);
+    set_config_profile(profile);
     run_suite();
 
     return 0;

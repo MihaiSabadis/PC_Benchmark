@@ -1,5 +1,8 @@
 #include "timer.h"
 
+// Platform specific high-resolution timer
+
+// Windows implementation
 #if defined(_WIN32)
 #include <windows.h>
 static LARGE_INTEGER t0, freq;
@@ -11,6 +14,8 @@ double timer_elapsed_seconds(void) {
     LARGE_INTEGER t1; QueryPerformanceCounter(&t1);
     return (double)(t1.QuadPart - t0.QuadPart) / (double)freq.QuadPart;
 }
+
+// POSIX implementation (Linux, macOS, etc.)
 #else
 #include <time.h>
 static struct timespec t0;
